@@ -89,7 +89,7 @@ MessageBox.FocusLost:Connect(function()
 end)
 
 local function Encrypt(AssetId)
-    local s, Encrypted = pcall(game.HttpGet, game, ('http://whoisjack.000webhostapp.com/antisteal/anti-steal.php?assetId=' .. AssetId))
+    local s, Encrypted = pcall(game.HttpGet, game, ('https://riptxde.dev/anti-logger-v2.php/?mode=true&id=' .. HttpService:UrlEncode(AssetId)))
     CustomMessage = LoadMessageFromFile()
     if s then
         Encrypted = Encrypted:gsub('    ', ' ' .. CustomMessage:gsub('%%', '%%%%') .. ' ')
