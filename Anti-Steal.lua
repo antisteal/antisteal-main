@@ -4,6 +4,7 @@ local Players = game:GetService'Players'
 local LocalPlayer = Players.LocalPlayer
 
 local HttpService = game:GetService'HttpService'
+local IsA = game.IsA
 
 local Rand = Random.new()
 local NextInt = Rand.NextInteger
@@ -33,8 +34,10 @@ local Encode = function(AssetId)
 end
 
 local Sync = function(Time)
-    for _, Object in next, LocalPlayer.Character:GetDescendants() do
-        if Object:IsA'Sound' then
+    local Objects = LocalPlayer.Character:GetDescendants()
+    for I = 1, #Objects do
+        local Object = Objects[I]
+        if IsA(Object, 'Sound') then
             Object.TimePosition = Time
         end
     end
@@ -75,7 +78,7 @@ local MassPlay = function(AssetId)
             local Sound = nil;
             repeat
                 for _, Object in next, Selected:GetDescendants() do
-                    if Object:IsA'Sound' and Object.TimeLength > 0 then
+                    if IsA(Object, 'Sound') and Object.TimeLength > 0 then
                         Sound = Object
                         break
                     end
