@@ -252,6 +252,24 @@ function Library:new(Parameters)
         TextXAlignment = Enum.TextXAlignment.Left
     })
 
+    local Detail = self:Create('Frame', {
+        Parent = Background,
+        Name = 'Detail',
+        Position = UDim2_new(1, -318, 0, 37),
+        Size = UDim2_new(0, 293, 0, 15),
+        BackgroundTransparency = 0,
+        BorderSizePixel = 0,
+        BackgroundColor3 = Color3_new(255, 255, 255),
+    }); self:Create('UIGradient', {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Colors.MainBorder),
+            ColorSequenceKeypoint.new(0.541, Colors.Mid),
+            ColorSequenceKeypoint.new(1, Colors.Main)
+        }),
+        Rotation = -90,
+        Parent = Detail
+    })
+
     local Holder = self:Create('Frame', {
         Parent = Background,
         Name = 'Holder',
@@ -311,25 +329,6 @@ function Library:new(Parameters)
         ZIndex = 2,
         Size = UDim2_new(1.1, 0, 0.2, 0),
         Position = UDim2_new(0, 0, 0.97, 0)
-    })
-
-    local Detail = self:Create('Frame', {
-        Parent = Background,
-        Name = 'Detail',
-        Position = UDim2_new(1, -318, 0, 37),
-        Size = UDim2_new(0, 293, 0, 15),
-        BackgroundTransparency = 0,
-        BorderSizePixel = 0,
-        BackgroundColor3 = Color3_new(255, 255, 255),
-        ZIndex = -1
-    }); self:Create('UIGradient', {
-        Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Colors.MainBorder),
-            ColorSequenceKeypoint.new(0.541, Colors.Mid),
-            ColorSequenceKeypoint.new(1, Colors.Main)
-        }),
-        Rotation = -90,
-        Parent = Detail
     })
 
     UI.Background.Exit.MouseButton1Click:Connect(function()
