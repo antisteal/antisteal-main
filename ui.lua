@@ -130,8 +130,8 @@ local AddSection = function(UI, Parameters)
                 BorderSizePixel = 0,
             }); Library:Create('TextBox', {
                 Parent = Box,
-                Position = UDim2_new(0.075, 0, 0.1, 0),
-                Size = UDim2_new(0.865, 0, 0.8, 0),
+                Position = UDim2_new(0.04, 0, 0.1, 0),
+                Size = UDim2_new(0.9, 0, 0.8, 0),
                 BackgroundColor3 = Colors.Mid,
                 BorderColor3 = Colors.Border,
                 Font = Enum.Font.Code,
@@ -140,22 +140,6 @@ local AddSection = function(UI, Parameters)
                 TextWrapped = true,
                 TextSize = 14,
                 TextColor3 = Color3_new(255, 255, 255),
-                TextXAlignment = Enum.TextXAlignment.Left
-            }); Library:Create('Frame', {
-                Parent = Box,
-                Name = 'Detail',
-                Position = UDim2_new(0.04, 0, 0.078, 0),
-                Size = UDim2_new(0, 6, 0, 21),
-                BackgroundColor3 = Colors.Mid,
-                BorderColor3 = Colors.Border,
-                BorderSizePixel = 1
-            }); Library:Create('Frame', {
-                Parent = Box.Detail,
-                Name = 'Detail',
-                BorderSizePixel = 0,
-                BackgroundColor3 = Colors.Mid,
-                Size = UDim2_new(0, 1, 0, 21),
-                Position = UDim2_new(1, 0, 0, 0)
             })
             
             Box.TextBox.FocusLost:Connect(function(Enter)
@@ -170,8 +154,7 @@ local AddSection = function(UI, Parameters)
                 BackgroundTransparency = 1,
                 BorderSizePixel = 0,
                 Parent = Section.Main
-            })
-            Library:Create('TextButton', {
+            }); Library:Create('TextButton', {
                 Parent = Button,
                 BackgroundColor3 = Colors.Mid,
                 BorderColor3 = Colors.Border,
