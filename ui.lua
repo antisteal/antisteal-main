@@ -66,7 +66,7 @@ local AddSection = function(UI, Parameters)
     })
 
     for Type, Info in next, Parameters do
-        if Type == 'Toggle' then
+        if Type:match('Box') then
             local Toggle = Library:Create('Frame', {
                 Parent = Section.Main,
                 Name = Type,
@@ -121,7 +121,7 @@ local AddSection = function(UI, Parameters)
 
                 Info[4](Bool)
             end)
-        elseif Type == 'Box' then
+        elseif Type:match('Box') then
             local Box = Library:Create('Frame', {
                 Parent = Section.Main,
                 Name = Type,
@@ -147,7 +147,7 @@ local AddSection = function(UI, Parameters)
                     Info[2](Box.TextBox.Text)
                 end
             end)
-        elseif Type == 'Button' then
+        elseif Type:match('Button') then
             local Button = Library:Create('Frame', {
                 Name = Type,
                 Size = UDim2_new(1, 0, 0.069, 0),
