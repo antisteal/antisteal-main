@@ -143,9 +143,9 @@ local AddSection = function(UI, Parameters)
             })
             
             Box.TextBox.FocusLost:Connect(function(Enter)
-                if Enter then
+                -- if Enter then
                     Info[2](Box.TextBox.Text)
-                end
+                -- end
             end)
         elseif Type:match('Button') then
             local Button = Library:Create('Frame', {
