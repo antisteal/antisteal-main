@@ -66,7 +66,7 @@ local AddSection = function(UI, Parameters)
     })
 
     for Type, Info in next, Parameters do
-        if Type:match('Box') then
+        if Type:match('Toggle') then
             local Toggle = Library:Create('Frame', {
                 Parent = Section.Main,
                 Name = Type,
