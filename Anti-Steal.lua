@@ -247,7 +247,7 @@ return UI:new({
                 Dupe
             },
             Box3 = {
-                'Time Position',
+                'Time/Sync',
                 function(Time)
                     if tonumber(Time) then
                         Sync(Time)
