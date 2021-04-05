@@ -1,6 +1,7 @@
 local Library = {} -- coded this while jamming shinitai chan - jack @ 10:06AM PST, 3/24/2021 (took me 3 hrs 22 seconds (i had to recode it))
 Library.flags = {}
 
+local TweenService = game:GetService'TweenService'
 local UDim2_new, Color3_new = UDim2.new, Color3.fromRGB
 
 function Library:Create(Class, Properties)
@@ -20,6 +21,11 @@ function Library:Create(Class, Properties)
 
     return Obj
 end
+
+local UI = Library:Create('ScreenGui', {
+    Name = 'UI',
+    Parent = game:GetService'CoreGui'
+})
 
 local Colors = {
     Main = Color3_new(30, 30, 30),
@@ -162,6 +168,108 @@ local AddSection = function(UI, Parameters)
     return Section
 end
 
+Library.Notify = {}
+local Notify = Library.Notify
+Notify.Notifications = {}
+
+function Notify:new(Title, Text, Time)
+    Title = Title or 'Notification'; Text = Text or 'Blacks in the premice!'; Time = Time or 5;
+
+    local Notification = {}
+
+    local Object = Library:Create('TextButton', {
+        Name = 'Notification',
+        BackgroundColor3 = Colors.MainBorder,
+        BorderColor3 = Colors.Border,
+        BackgroundTransparency = 0,
+        BorderSizePixel = 2,
+        Position = UDim2_new(1.5, -270, 1, -104),
+        Size = UDim2_new(0, 270, 0, 80),
+        Text = ''
+    }); Library:Create('Frame', {
+        Name = 'Topbar',
+        Position = UDim2_new(0, 0, 0, 0),
+        Size = UDim2_new(1, 0, 0.3, 0),
+        BackgroundTransparency = 0,
+        BorderSizePixel = 0,
+        BackgroundColor3 = Color3_new(255, 255, 255),
+        Parent = Object
+    }); Library:Create('UIGradient', {
+        Parent = Object.Topbar,
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3_new(129, 129, 129)),
+            ColorSequenceKeypoint.new(0.128, Color3_new(40, 40, 40)),
+            ColorSequenceKeypoint.new(1, Color3_new(20, 20, 20))
+        }),
+        Rotation = 90
+    }); Library:Create('TextLabel', {
+        BackgroundTransparency = 1,
+        Position = UDim2_new(0, 0, 0, 0),
+        Size = UDim2_new(1, 0, 0.8, 0),
+        Font = Enum.Font.Code,
+        Text = ' ' .. Title,
+        TextColor3 = Color3_new(255, 255, 255),
+        TextSize = 16,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Name = 'Title',
+        Parent = Object.Topbar
+    }); Library:Create('TextLabel', {
+        Text = Text,
+        TextColor3 = Color3_new(255, 255, 255),
+        TextWrapped = true,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Top,
+        TextSize = 15,
+        Font = Enum.Font.Code,
+        BackgroundTransparency = 1,
+        Position = UDim2_new(0.026, 0, 0.299, 0),
+        Size = UDim2_new(0.98, 0, 0.7, 0),
+        Parent = Object
+    })
+
+    Notification.Object = Object
+
+    function Notification:Close()
+        return TweenService:Create(Object, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.In, 0, false, 0), {
+            Position = UDim2.new(1.3, 0, Object.Position.Y.Scale, 0)
+        }):Play()
+    end
+
+    Object.Parent = UI
+
+    table.insert(Notify.Notifications, Notification)
+
+    for I, FoundNotification in next, Notify.Notifications do
+        if FoundNotification ~= Notification then
+            TweenService:Create(FoundNotification.Object, TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.Out, 0, false, 0), {
+                Position = UDim2_new(1, -270, 1, (-104 - (90 * (#Notify.Notifications - I))))
+            }):Play()
+        end
+    end
+
+    TweenService:Create(Object, TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.Out, 0, false, 0), {
+        Position = UDim2_new(1, -270, 1, -104)
+    }):Play()
+
+    coroutine.wrap(function()
+        wait(Time)
+
+        if Notification then
+            Notification:Close()
+
+            local Obj = Notification.Object
+
+            table.remove(Notify.Notifications, table.find(Notify.Notifications, Notification))
+
+            wait(0.5)
+
+            Obj:Destroy()
+        end
+    end)()
+
+    return Notification
+end
+
 function Library:new(Parameters)
     Parameters = Parameters or {
         Name = 'dot_mp4 wuz here :D',
@@ -191,15 +299,17 @@ function Library:new(Parameters)
                             Player.Character:ClearAllChildren()
                         end
                     end
+                },
+                NotifButton = {
+                    'notif',
+                    function()
+                        Notify:new('Test', 'test', 3)
+                    end
                 }
             }
         }
     }
 
-    local UI = self:Create('ScreenGui', {
-        Name = 'UI',
-        Parent = game:GetService'CoreGui'
-    })
     local Background = self:Create('Frame', {
         Name = 'Background',
         Size = UDim2_new(0, 385, 0, 263),
