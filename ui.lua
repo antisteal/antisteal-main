@@ -73,24 +73,20 @@ local AddSection = function(UI, Parameters)
                 Size = UDim2_new(1, 0, 0.069, 0),
                 BackgroundTransparency = 1,
                 BorderSizePixel = 0,
-            }); Library:Create('TextButton', {
+            }); Library:Create('ImageButton', {
                 Parent = Toggle,
                 Name = 'Button',
-                BackgroundColor3 = (Info[2] and Color3_new(255, 255, 255)) or Colors.Mid,
+                BackgroundColor3 = Colors.Mid,
                 BorderColor3 = Colors.Border,
                 BorderSizePixel = 1,
                 Size = UDim2_new(0.12, 0, 0.8, 0),
                 Position = UDim2_new(0.04, 0, 0.1, 0),
                 Text = '',
-                TextSize = 14
-            }); Library:Create('UIGradient', {
-                Parent = Toggle.Button,
-                Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3_new(202, 202, 202)),
-                    ColorSequenceKeypoint.new(1, Color3_new(230, 230, 230))
-                }),
-                Rotation = 90,
-                Enabled = Info[2]
+                TextSize = 14,
+                ImageColor3 = Color3.fromRGB(255, 255, 255),
+                ImageTransparency = (Info[2] and 0) or 1,
+                Image = 'http://www.roblox.com/asset/?id=4776914445',
+                ScaleType = Enum.ScaleType.Fit,
             }); Library:Create('TextLabel', {
                 Parent = Toggle,
                 Name = 'Label',
@@ -112,12 +108,7 @@ local AddSection = function(UI, Parameters)
                 Library.flags[Flag] = not Library.flags[Flag]
                 local Bool = Library.flags[Flag]
                 
-                Toggle.Button.UIGradient.Enabled = Bool
-                if not Bool then
-                    Toggle.Button.BackgroundColor3 = Colors.Mid
-                else
-                    Toggle.Button.BackgroundColor3 = Color3_new(255, 255, 255)
-                end
+                Toggle.Button.ImageTransparency = (Bool and 0) or 1
 
                 Info[4](Bool)
             end)
@@ -142,10 +133,8 @@ local AddSection = function(UI, Parameters)
                 TextColor3 = Color3_new(255, 255, 255),
             })
             
-            Box.TextBox.FocusLost:Connect(function(Enter)
-                -- if Enter then
-                    Info[2](Box.TextBox.Text)
-                -- end
+            Box.TextBox.FocusLost:Connect(function()
+                Info[2](Box.TextBox.Text)
             end)
         elseif Type:match('Button') then
             local Button = Library:Create('Frame', {
