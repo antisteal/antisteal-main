@@ -67,7 +67,7 @@ local AddSection = function(UI, Parameters)
         BackgroundColor3 = Colors.MainBorder,
         BorderSizePixel = 0,
         Position = UDim2_new(0.075, 0, -0.03, 0),
-        Size = UDim2_new(0, (8 * Parameters.SectionText:len()), 0, 15),
+        Size = UDim2_new(0, (9 * Parameters.SectionText:len()), 0, 15),
         Text = Parameters.SectionText
     })
 
@@ -120,23 +120,34 @@ local AddSection = function(UI, Parameters)
             end)
         elseif Type:match('Box') then
             local Box = Library:Create('Frame', {
+                BackgroundTransparency = 1,
                 Parent = Section.Main,
                 Name = Type,
-                Size = UDim2_new(1, 0, 0.069, 0),
+                Size = UDim2_new(1, 0, 0.11, 0)
+            }); Library:Create('TextLabel', {
                 BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-            }); Library:Create('TextBox', {
                 Parent = Box,
-                Position = UDim2_new(0.04, 0, 0.1, 0),
-                Size = UDim2_new(0.9, 0, 0.8, 0),
+                Size = UDim2_new(0.9, 0, 0.3, 0),
+                Position = UDim2_new(0.06, 0, 0.1, 0),
+                Font = Enum.Font.Code,
+                Text = Info[1],
+                TextColor3 = Color3_new(255, 255, 255),
+                TextSize = 14,
+                TextXAlignment = Enum.TextXAlignment.Left
+            }); Library:Create('TextBox', {
+                Font = Enum.Font.Code,
+                Text = '',
+                PlaceholderText = 'Input',
+                PlaceholderColor3 = Color3_new(178, 178, 178),
+                TextColor3 = Color3_new(255, 255, 255),
+                TextSize = 14,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                BackgroundTransparency = 0,
                 BackgroundColor3 = Colors.Mid,
                 BorderColor3 = Colors.Border,
-                Font = Enum.Font.Code,
-                PlaceholderText = ' ' .. Info[1],
-                Text = '',
-                TextWrapped = true,
-                TextSize = 14,
-                TextColor3 = Color3_new(255, 255, 255),
+                BorderSizePixel = 1,
+                Position = UDim2_new(0.04, 0, 0.44, 0),
+                Size = UDim2_new(0.9, 0, 0.43, 0)
             })
             
             Box.TextBox.FocusLost:Connect(function()
@@ -234,6 +245,10 @@ function Notify:new(Title, Text, Time)
             Position = UDim2.new(1.3, 0, Object.Position.Y.Scale, 0)
         }):Play()
     end
+
+    Object.MouseButton1Click:Connect(function()
+        Notification:Close()
+    end)
 
     Object.Parent = UI
 
