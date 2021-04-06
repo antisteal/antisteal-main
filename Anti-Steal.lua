@@ -140,7 +140,7 @@ local Dupe = function(Amount)
             break
         end
 
-        UI.Notify:new('Dupe Index', IDX)
+        UI.Notify:new('Dupe Index', tostring(IDX) .. ' out of ' .. tostring(Amount))
         Humanoid:UnequipTools()
 
         for _, Tool in next, LocalPlayer.Backpack:GetChildren() do
