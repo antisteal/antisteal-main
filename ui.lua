@@ -147,7 +147,8 @@ local AddSection = function(UI, Parameters)
                 BorderColor3 = Colors.Border,
                 BorderSizePixel = 1,
                 Position = UDim2_new(0.04, 0, 0.44, 0),
-                Size = UDim2_new(0.9, 0, 0.43, 0)
+                Size = UDim2_new(0.9, 0, 0.43, 0),
+                Parent = Box
             })
             
             Box.TextBox.FocusLost:Connect(function()
