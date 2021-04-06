@@ -141,7 +141,6 @@ local AddSection = function(UI, Parameters)
                 PlaceholderColor3 = Color3_new(178, 178, 178),
                 TextColor3 = Color3_new(255, 255, 255),
                 TextSize = 14,
-                TextXAlignment = Enum.TextXAlignment.Left,
                 BackgroundTransparency = 0,
                 BackgroundColor3 = Colors.Mid,
                 BorderColor3 = Colors.Border,
