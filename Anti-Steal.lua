@@ -4,7 +4,9 @@ local Players = game:GetService'Players'
 local LocalPlayer = Players.LocalPlayer
 
 local HttpService = game:GetService'HttpService'
-local IsA = game.IsA
+local IsA, WaitForChild = game.IsA, game.WaitForChild
+
+local RunService = game:GetService'RunService'
 
 local Rand = Random.new()
 local NextInt = Rand.NextInteger
@@ -33,7 +35,10 @@ local Encode = function(AssetId)
     return game:HttpPost('https://dot-mp4.dev/free/anti-steal.php', HttpService:JSONEncode(Settings))
 end
 
+local SyncTime = 0
 local Sync = function(Time)
+    Time = Time or 0
+
     local Objects = LocalPlayer.Character:GetDescendants()
     for I = 1, #Objects do
         local Object = Objects[I]
@@ -93,101 +98,159 @@ local MassPlay = function(AssetId)
     end
 end
 
-local Duping = false
-local Dupe = function()
-    Duping = not Duping
+local Duping, DupeAmount = false, 8
 
-    if Duping then
-        local Tools = {}
+local Dupe = function(Amount)
+    UI.Notify:new('Dupe', ('Amount: %s'):format(Amount))
 
-        local Character = LocalPlayer.Character
-        if not Character then
-            return
+    Duping = true
+
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Humanoid = WaitForChild(Character, 'Humanoid', 10)
+
+    if not Humanoid then
+        return UI.Notify:new('Warning', 'No compatible humanoid found.')
+    end
+
+    local Root = WaitForChild(Character, 'HumanoidRootPart', 10)
+
+    if not Root then
+        return UI.Notify:new('Warning', 'No root found.')
+    end
+
+    do
+        local FoundTools = {}
+        Humanoid:UnequipTools()
+
+        for _, Tool in next, LocalPlayer.Backpack:GetChildren() do
+            if Tool.Name:lower():match('boombox') then
+                table.insert(FoundTools, Tool)
+            end
         end
 
-        local Humanoid = Character:WaitForChild('Humanoid', 6)
-        if not Humanoid then
-            return
+        if #FoundTools < 1 then
+            return UI.Notify:new('Error', 'You do not have any compatible tools to dupe.')
+        end
+    end
+
+    local FoundTools = {}
+
+    for IDX = 1, Amount do
+        if not Duping then
+            break
         end
 
-        local Root = Character:WaitForChild('HumanoidRootPart', 6)
-        if not Root then
-            return
-        end
+        UI.Notify:new('Dupe Index', IDX)
+        Humanoid:UnequipTools()
 
-        local RCF = Root.CFrame
-
-        repeat
-            Humanoid:UnequipTools()
-
-            local FoundTools = {}; do
-                for _, Tool in next, LocalPlayer.Backpack:GetChildren() do
-                    if Tool.Name:lower():match'boombox' then
-                        FoundTools[#FoundTools+1] = Tool
-                    end
+        for _, Tool in next, LocalPlayer.Backpack:GetChildren() do
+            if Tool.Name:lower():match('boombox') then
+                if not table.find(FoundTools, Tool) then
+                    table.insert(FoundTools, Tool)
+                    Tool.Parent = Character
                 end
             end
-
-            Root.CFrame = CFrame.new(NextInt(Rand, -2e4, 2e4), 2e4, NextInt(Rand, -2e4, 2e4))
-            
-            wait(.2)
-
-            Root.Anchored = true
-
-            wait(.2)
-
-            for _, Tool in next, FoundTools do
-                Tool.Parent = Character
-            end
-
-            wait(.2)
-
-            for _, Tool in next, FoundTools do
-                Tool.Parent = workspace
-                Tool.Handle.Anchored = true
-                Tools[#Tools+1] = Tool
-            end
-
-            wait(.2)
-
-            Character:BreakJoints()
-
-            Character = LocalPlayer.CharacterAdded:Wait()
-            Humanoid = Character:WaitForChild'Humanoid'
-            Root = Character:WaitForChild'HumanoidRootPart'
-
-            wait(.2)
-        until not Duping
-
-        if #Tools < 1 then
-            return
         end
 
-        Root.CFrame = RCF
+        wait(0.5)
 
-        wait(.2)
+        Root.CFrame = CFrame.new(NextInt(Rand, -2e4, 2e4), 2e4, NextInt(Rand, -2e4, 2e4))
 
-        for _, Tool in next, Tools do
-            Tool.Handle.Anchored = false
-            Tool.Handle.CFrame = Root.CFrame
-            wait()
+        wait(0.2)
+
+        Root.Anchored = true
+
+        wait(0.2)
+
+        for _, Tool in next, FoundTools do
+            Tool.Handle.Anchored = true
+            Tool.Parent = workspace
         end
+
+        Character:BreakJoints()
+
+        Character = LocalPlayer.CharacterAdded:Wait()
+        Humanoid = WaitForChild(Character, 'Humanoid')
+        Root = WaitForChild(Character, 'HumanoidRootPart')
+    end
+
+    UI.Notify:new('Dupe complete.', ('Finished with %s tools. %s of them were stolen.'):format(#FoundTools, (function() 
+        local StolenTools = {}
+        
+        for _, Tool in next, FoundTools do
+            if Tool.Parent ~= workspace and Tool.Parent ~= Character and Tool.Parent ~= LocalPlayer.Backpack then
+                table.insert(StolenTools, Tool)
+            end
+        end
+
+        if #StolenTools == #FoundTools then
+            return 'All'
+        end
+
+        return #StolenTools
+    end)()))
+
+    for _, Tool in next, FoundTools do
+        Tool.Handle.CFrame = Root.CFrame
+        Tool.Handle.Anchored = false
+        firetouchinterest(Root, Tool.Handle, 0)
+        wait()
     end
 end
 
-return UI:new({
-    Name = 'antisteal - release v7',
+local antisteal = UI:new({
+    Name = 'antisteal - release v7.33',
     Tab = {
         Text = 'Main',
+        Section2 = {
+            SectionText = 'Other',
+            MassPlayButton = {
+                'Mass Play',
+                function()
+                    MassPlay(Settings.AssetId)
+                end
+            },
+            DupeAmountBox = {
+                'Dupe Amount [Default: 8]',
+                function(Amount)
+                    DupeAmount = tonumber(Amount) or 8
+                end
+            },
+            DupeButton = {
+                'Dupe',
+                function()
+                    Dupe(DupeAmount)
+                end
+            },
+            CDupeButton = {
+                'Cancel Dupe',
+                function()
+                    Duping = false
+                end
+            },
+            SyncTimeBox = {
+                'Sync Time [Default: 0]',
+                function(Time)
+                    SyncTime = tonumber(Time) or 0
+                end
+            },
+            SyncButton = {
+                'Sync',
+                function()
+                    Sync(SyncTime)
+                end
+            }
+        },
         Section1 = {
             SectionText = 'Anti-Log',
-            Box = {
+            AssetBox = {
                 'Set Asset Id',
                 function(AssetId)
+                    UI.Notify:new('antisteal', 'Your selected AssetId has been set to "' .. AssetId .. '"', 5)
                     Settings.AssetId = AssetId
                 end
             },
-            Toggle = {
+            EncodeToggle = {
                 'Encode Baits',
                 Settings.Encode,
                 'Encode',
@@ -196,7 +259,7 @@ return UI:new({
                     SaveSettings()
                 end
             },
-            Toggle2 = {
+            HexToggle = {
                 'Hex',
                 Settings.Hex,
                 'Hex',
@@ -205,13 +268,13 @@ return UI:new({
                     SaveSettings()
                 end
             },
-            Box2 = {
+            MessageBox = {
                 'Custom Message',
                 function(Message)
                     Settings.Message = Message
                 end
             },
-            Button = {
+            PlayButton = {
                 'Play',
                 function()
                     local Character = LocalPlayer.Character
@@ -229,37 +292,31 @@ return UI:new({
                             local Remote = Radio:FindFirstChildOfClass'RemoteEvent'
                             if Remote then
                                 local EncodedId = Encode(Settings.AssetId)
+
                                 if EncodedId then
-                                    Remote:FireServer(RemoteArg, EncodedId)
+                                    return Remote:FireServer(RemoteArg, EncodedId)
                                 end
+
+                                return UI.Notify:new('Failed', 'Your audio didnt encode properly.')
                             end
+
+                            return UI.Notify:new('Failed', 'Your radio is incompatible.')
                         end
+
+                        return UI.Notify:new('Failed', 'Your radio is incompatible or none have been found.')
                     end
                 end
             }
-        },
-        Section2 = {
-            SectionText = 'Other',
-            Toggle3 = {
-                'Dupe',
-                false,
-                'dupe',
-                Dupe
-            },
-            Box3 = {
-                'Time/Sync',
-                function(Time)
-                    if tonumber(Time) then
-                        Sync(Time)
-                    end
-                end
-            },
-            Button2 = {
-                'Mass Play',
-                function()
-                    MassPlay(Settings.AssetId)
-                end
-            },
         }
     }
 })
+
+local UserInputService = game:GetService'UserInputService'
+
+UserInputService.InputBegan:Connect(function(InputObject)
+    if not UserInputService:GetFocusedTextBox() then
+        if InputObject.KeyCode == Enum.KeyCode.J then
+            UI.Enabled = not UI.Enabled 
+        end
+    end
+end)
