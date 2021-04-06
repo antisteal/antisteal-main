@@ -211,7 +211,7 @@ local antisteal = UI:new({
                 end
             },
             DupeAmountBox = {
-                'Dupe Amount [Default: 8]',
+                'Dupe Amount [D: 8]',
                 function(Amount)
                     DupeAmount = tonumber(Amount) or 8
                 end
@@ -229,7 +229,7 @@ local antisteal = UI:new({
                 end
             },
             SyncTimeBox = {
-                'Sync Time [Default: 0]',
+                'Sync Time [D: 0]',
                 function(Time)
                     SyncTime = tonumber(Time) or 0
                 end
