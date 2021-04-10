@@ -37,13 +37,30 @@ end
 
 local SyncTime = 0
 local Sync = function(Time)
-    Time = Time or 0
+    local Character = LocalPlayer.Character
+    if not Character then
+        return UI.Notify:new('Warning', 'No Character.')
+    end
 
-    local Objects = LocalPlayer.Character:GetDescendants()
-    for I = 1, #Objects do
-        local Object = Objects[I]
+    local Selected = Character:FindFirstChildOfClass'Tool'
+    if not Selected then
+        return UI.Notify:new('Warning', 'No tool to sync from found.')
+    end
+
+    local Sound; do
+        repeat
+            for _, V in next, Selected:GetDescendants() do
+                if IsA(V, 'Sound') and V.IsLoaded and V.TimeLength > 0 and V.SoundId:match('DMakTbZ') then
+                    Sound = V; break;
+                end
+            end
+            wait(.06)
+        until Sound
+    end
+
+    for _, Object in next, Character:GetDescendants() do
         if IsA(Object, 'Sound') then
-            Object.TimePosition = Time
+            Object.TimePosition = Time or (math.round(Sound.TimePosition) - .5)
         end
     end
 end
@@ -80,20 +97,9 @@ local MassPlay = function(AssetId)
                 end
             end
 
-            local Sound = nil;
-            repeat
-                for _, Object in next, Selected:GetDescendants() do
-                    if IsA(Object, 'Sound') and Object.TimeLength > 0 then
-                        Sound = Object
-                        break
-                    end
-                end
-                wait(.06)
-            until Sound
+            wait(2)
 
-            local Time = math.round(Sound.TimePosition) - .5
-
-            Sync(Time)
+            Sync()
         end
     end
 end
@@ -135,70 +141,93 @@ local Dupe = function(Amount)
 
     local FoundTools = {}
 
+    local RCF = Root.CFrame
+
+    local GrabTool = function(Tool)
+        Tool.Handle.Anchored = false
+
+        if type(firetouchinterest) ~= 'function' then
+            coroutine.wrap(function()
+                for I = 1, 5 do
+                    Tool.Handle.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
+                end
+            end)()
+        end
+
+        pcall(firetouchinterest, Root, Tool.Handle, 0)
+    end
+
     for IDX = 1, Amount do
         if not Duping then
             break
         end
 
-        UI.Notify:new('Dupe Index', tostring(IDX) .. ' out of ' .. tostring(Amount))
-        Humanoid:UnequipTools()
+        local CCF = CFrame.new(NextInt(Rand, -2e4, 2e4), 2e4, NextInt(Rand, -2e4, 2e4))
+
+        wait(.2)
+
+        Root.CFrame = CCF
+
+        wait(.2)
+
+        Root.Anchored = true
+        
+        wait(.2)
 
         for _, Tool in next, LocalPlayer.Backpack:GetChildren() do
-            if Tool.Name:lower():match('boombox') then
-                if not table.find(FoundTools, Tool) then
-                    table.insert(FoundTools, Tool)
-                    Tool.Parent = Character
-                end
+            if Tool.Name:lower():match'boombox' then
+                Tool.Parent = Character
+                Tool.Handle.Anchored = true
+                table.insert(FoundTools, Tool)
             end
         end
 
-        wait(0.5)
+        wait(.2)
 
-        Root.CFrame = CFrame.new(NextInt(Rand, -2e4, 2e4), 2e4, NextInt(Rand, -2e4, 2e4))
-
-        wait(0.2)
-
-        Root.Anchored = true
-
-        wait(0.2)
-
-        for _, Tool in next, FoundTools do
-            Tool.Handle.Anchored = true
-            Tool.Parent = workspace
+        for I = 1, #FoundTools do
+            Root.CFrame = Root.CFrame
+            FoundTools[I].Parent = workspace
         end
+
+        wait(.2)
 
         Character:BreakJoints()
 
         Character = LocalPlayer.CharacterAdded:Wait()
-        Humanoid = WaitForChild(Character, 'Humanoid')
+        LocalPlayer.CharacterAppearanceLoaded:Wait()
+
         Root = WaitForChild(Character, 'HumanoidRootPart')
+        Humanoid = WaitForChild(Character, 'Humanoid')
     end
 
     UI.Notify:new('Dupe complete.', ('Finished with %s tools. %s of them were stolen.'):format(#FoundTools, (function() 
-        local StolenTools = {}
+        local StolenTools = 0
         
         for _, Tool in next, FoundTools do
             if Tool.Parent ~= workspace and Tool.Parent ~= Character and Tool.Parent ~= LocalPlayer.Backpack then
-                table.insert(StolenTools, Tool)
+                StolenTools = StolenTools + 1
             end
         end
 
-        if #StolenTools == #FoundTools then
+        if StolenTools == #FoundTools then
             return 'All'
         end
 
-        return #StolenTools
+        if StolenTools == 0 then
+            return 'None'
+        end
+
+        return tostring(StolenTools)
     end)()))
 
     for _, Tool in next, FoundTools do
-        Tool.Handle.CFrame = Root.CFrame
-        Tool.Handle.Anchored = false
-        firetouchinterest(Root, Tool.Handle, 0)
-        wait()
+        GrabTool(Tool)
     end
+
+    Root.CFrame = RCF
 end
 
-local antisteal = UI:new({
+local ASUI = UI:new({
     Name = 'antisteal - release v7.33',
     Tab = {
         Text = 'Main',
@@ -231,7 +260,7 @@ local antisteal = UI:new({
             SyncTimeBox = {
                 'Sync Time [D: 0]',
                 function(Time)
-                    SyncTime = tonumber(Time) or 0
+                    SyncTime = tonumber(Time) or nil
                 end
             },
             SyncButton = {
@@ -246,7 +275,7 @@ local antisteal = UI:new({
             AssetBox = {
                 'Set Asset Id',
                 function(AssetId)
-                    UI.Notify:new('antisteal', 'Your selected AssetId has been set to "' .. AssetId .. '"', 5)
+                    UI.Notify:new('Success', 'Your selected AssetId has been set to "' .. AssetId .. '"', 5)
                     Settings.AssetId = AssetId
                 end
             },
@@ -316,7 +345,7 @@ local UserInputService = game:GetService'UserInputService'
 UserInputService.InputBegan:Connect(function(InputObject)
     if not UserInputService:GetFocusedTextBox() then
         if InputObject.KeyCode == Enum.KeyCode.J then
-            UI.Enabled = not UI.Enabled 
+            ASUI.Enabled = not ASUI.Enabled 
         end
     end
 end)
