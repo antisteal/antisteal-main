@@ -49,7 +49,9 @@ local Sync = function(Time)
 
     local Sound; do
         repeat
-            for _, V in next, Selected:GetDescendants() do
+            local SelectedDescendants = Selected:GetDescendants()
+            for I = 1, #SelectedDescendants do
+                local V = SelectedDescendants[I]
                 if IsA(V, 'Sound') and V.IsLoaded and V.TimeLength > 0 and V.SoundId:match('DMakTbZ') then
                     Sound = V; break;
                 end
@@ -58,9 +60,11 @@ local Sync = function(Time)
         until Sound
     end
 
-    for _, Object in next, Character:GetDescendants() do
-        if IsA(Object, 'Sound') then
-            Object.TimePosition = Time or (math.round(Sound.TimePosition) - .5)
+    local CharacterDescendants = Character:GetDescendants()
+    for I = 1, #CharacterDescendants do
+        local V = CharacterDescendants[I]
+        if IsA(V, 'Sound') then
+            V.TimePosition = Time or (math.round(Sound.TimePosition) - .5)
         end
     end
 end
