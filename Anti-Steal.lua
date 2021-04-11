@@ -7,6 +7,7 @@ local HttpService = game:GetService'HttpService'
 local IsA, WaitForChild = game.IsA, game.WaitForChild
 
 local RunService = game:GetService'RunService'
+local MarketplaceService = game:GetService'MarketplaceService'
 
 local Rand = Random.new()
 local NextInt = Rand.NextInteger
@@ -279,8 +280,13 @@ local ASUI = UI:new({
             AssetBox = {
                 'Set Asset Id',
                 function(AssetId)
-                    UI.Notify:new('Success', 'Your selected AssetId has been set to "' .. AssetId .. '"', 5)
-                    Settings.AssetId = AssetId
+                    if tonumber(AssetId) and pcall(MarketplaceService.GetProductInfo, MarketplaceService, tonumber(AssetId)) and MarketplaceService:GetProductInfo(tonumber(AssetId)).Name then
+                        UI.Notify:new('Success', 'Your selected AssetId has been set to "' .. AssetId .. '"', 5)
+                        Settings.AssetId = AssetId
+                        return
+                    end
+                        
+                    UI.Notify:new('Failed', 'Not a valid AssetId', 5)
                 end
             },
             EncodeToggle = {
