@@ -151,13 +151,7 @@ local Dupe = function(Amount)
     local GrabTool = function(Tool)
         Tool.Handle.Anchored = false
 
-        if type(firetouchinterest) ~= 'function' then
-            coroutine.wrap(function()
-                for I = 1, 5 do
-                    Tool.Handle.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
-                end
-            end)()
-        end
+        Tool.Handle.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
 
         pcall(firetouchinterest, Root, Tool.Handle, 0)
     end
