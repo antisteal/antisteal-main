@@ -326,7 +326,7 @@ local ASUI = UI:new({
                             if Remote then
                                 local EncodedId = Encode(Settings.AssetId)
 
-                                if EncodedId then
+                                if EncodedId and not EncodedId:match'Error:' then
                                     return Remote:FireServer(RemoteArg, EncodedId)
                                 end
 
