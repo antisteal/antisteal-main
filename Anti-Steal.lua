@@ -78,6 +78,9 @@ local MassPlay = function(AssetId)
             Humanoid:UnequipTools()
             
             local EncodedId = Encode(AssetId)
+            if EncodedId:match'Error:' then
+                return UI.Notify:new('Failed', 'Your audio didnt encode properly.')
+            end
 
             local Tools = {}; do
                 for _, Tool in next, LocalPlayer.Backpack:GetChildren() do
