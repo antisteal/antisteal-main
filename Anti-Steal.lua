@@ -230,7 +230,7 @@ local Dupe = function(Amount)
 end
 
 local ASUI = UI:new({
-    Name = 'antisteal - release v7.33',
+    Name = 'antisteal v7 [discontinued]',
     Tab = {
         Text = 'Main',
         Section2 = {
